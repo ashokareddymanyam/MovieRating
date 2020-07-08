@@ -1,8 +1,8 @@
 # MovieRating
 FindTopOrders.java is for stadalone code to find top 2 orders 
-The file is available in com.movierating.api.app package same Project 
+The file is available in com.movierating.api.app package in same project 
 
-This Application Built on StringBoot having auto configuration and for faster development
+This Application Built on SpringBoot having auto configuration and for faster development
 
 Prerequisites Data.sql added in resource folder
 -----------------------------------------------------------------

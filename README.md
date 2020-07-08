@@ -1,12 +1,12 @@
 # MovieRating
 FindTopOrders.java is for stadalone code to find top 2 orders 
-The file is available in com.test.movieratingapp package same Project 
+The file is available in com.movierating.api.app package same Project 
 
 This Application Built on StringBoot having auto configuration and for faster development
 
 Prerequisites Data.sql added in resource folder
 -----------------------------------------------------------------
-pass the customer/{id}/rate/4.45?movie="movieName"
+pass the customer/{id}/rate/{rating}?movie="movieName"
 Post call for rating movie url
 eg:
 localhost:8080/api/rest/customer/1/rate/3.45?movie=Kite

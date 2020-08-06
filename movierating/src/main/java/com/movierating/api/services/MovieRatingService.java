@@ -39,12 +39,12 @@ public class MovieRatingService {
 	 */
 	@Transactional
 	public MovieData addRatingToMovie(Long id, String movieName, Double rating) {
-		
+		MovieData movieData = new MovieData();
 		Optional<CustomerData> CustomerOpt = customerDataRepository.findById(id);
 		Customer customer = new Customer();
 		if(CustomerOpt.isPresent()) {
 			CustomerData dbCustomer = CustomerOpt.get();
-			MovieData movieData = new MovieData();
+			
 			movieData.setMovieName(movieName);
 			Set<Customer> customerSet = movieData.getCustomer();
 			customer.setCustomerId(id);
@@ -55,7 +55,7 @@ public class MovieRatingService {
 			return movieDataRepo.save(movieData);
 		}
 		
-		return null;
+		return movieData;
 		
 	}
 

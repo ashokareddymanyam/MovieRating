@@ -67,15 +67,15 @@ public class MovieRatingService {
 	public String findHighestRatedMovie() {
 		
 		List<MovieData> movieData = movieDataRepo.findAll();
-		Map<Double,String> movieMap = new HashMap<>(); 
+		Map<String,Double> movieMap = new HashMap<>(); 
 		
 		movieData.forEach(i ->{
 			Set<Customer> customerSet = i.getCustomer();
 			double movieAVG = customerSet.stream().mapToDouble(Customer::getRating).average().orElse(Double.NaN);
-			movieMap.put(movieAVG,i.getMovieName());
+			movieMap.put(i.getMovieName(),movieAVG);
 		});
 		
-		String movie = Collections.max(movieMap.entrySet(), Comparator.comparingDouble(Map.Entry::getKey)).getValue();
+		String movie = Collections.max(movieMap.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
 		System.out.println(movie);
 		return movie;
 	}

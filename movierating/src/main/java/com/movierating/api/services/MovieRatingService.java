@@ -6,9 +6,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -64,20 +66,27 @@ public class MovieRatingService {
 	 * 
 	 * @return String
 	 */
-	public String findHighestRatedMovie() {
+	public Optional<String> findHighestRatedMovie() {
 		
 		List<MovieData> movieData = movieDataRepo.findAll();
 		Map<String,Double> movieMap = new HashMap<>(); 
-		
+		String movieName = null;
 		movieData.forEach(i ->{
 			Set<Customer> customerSet = i.getCustomer();
 			double movieAVG = customerSet.stream().mapToDouble(Customer::getRating).average().orElse(Double.NaN);
 			movieMap.put(i.getMovieName(),movieAVG);
 		});
 		
-		String movie = Collections.max(movieMap.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
-		System.out.println(movie);
-		return movie;
+		//String movie = Collections.max(movieMap.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
+		Comparator<Entry<String, Double>> comparing = Comparator.comparing(Map.Entry<String,Double>::getValue);
+		//Comparator<Entry<String, Double>> comparingByValue = Map.Entry.comparingByValue();
+		Optional<Entry<String, Double>> collect = movieMap.entrySet().stream().collect(Collectors.maxBy(comparing));
+		if(collect.isPresent()) {
+			Entry<String, Double> entry = collect.get();
+			System.out.println(entry.getKey());
+			movieName = entry.getKey();
+		}
+		return Optional.ofNullable(movieName);
 	}
 
 	/**
@@ -119,18 +128,25 @@ public class MovieRatingService {
 			}
 		});
 		
-		String customerName = Collections.max(avgMap.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
-		Double maxAvgRating = avgMap.get(customerName);
-		
-		OptionalDouble overAllCustAvg = overAllCustomerRatingList.stream().mapToDouble(a -> a).average();
+		//String customerName = Collections.max(avgMap.entrySet(), Comparator.comparingDouble(Map.Entry::getValue)).getKey();
+		Comparator<Entry<String, Double>> comparing = Comparator.comparing(Map.Entry<String,Double>::getValue);
+		Optional<Entry<String, Double>> collect = avgMap.entrySet().stream().collect(Collectors.maxBy(comparing));
 		
 		CustomerVM custVM = new CustomerVM();
-		String[] split = customerName.split("\\|");
-		custVM.setId(fetchCustomerId(split[0],split[1]));
-		custVM.setFirstName(split[0]);
-		custVM.setLastName(split[1]);
-		custVM.setCustomerAvgRating(maxAvgRating);
-		custVM.setAvgRating(overAllCustAvg.getAsDouble());
+		if(collect.isPresent()) {
+			Entry<String, Double> entry = collect.get();
+			
+			String customerName = entry.getKey();
+			Double maxAvgRating = entry.getValue();
+			
+			OptionalDouble overAllCustAvg = overAllCustomerRatingList.stream().mapToDouble(a -> a).average();
+			String[] split = customerName.split("\\|");
+			custVM.setId(fetchCustomerId(split[0],split[1]));
+			custVM.setFirstName(split[0]);
+			custVM.setLastName(split[1]);
+			custVM.setCustomerAvgRating(maxAvgRating);
+			custVM.setAvgRating(overAllCustAvg.getAsDouble());
+		}
 		
 		return custVM;
 		
@@ -144,10 +160,11 @@ public class MovieRatingService {
 	 * @return Long
 	 */
 	private Long fetchCustomerId(String firstName, String lastName) {
-		Long idUsingFirstLastName = customerDataRepository.getIDUsingFirstLastName(firstName,lastName);
-		if(null != idUsingFirstLastName) {
-			return idUsingFirstLastName;
-		}
+		Optional<Long> idUsingFirstLastName = customerDataRepository.getIDUsingFirstLastName(firstName,lastName);
+		
+		if(idUsingFirstLastName.isPresent()) 
+			return idUsingFirstLastName.get();
+		
 		return null;
 	}
 	

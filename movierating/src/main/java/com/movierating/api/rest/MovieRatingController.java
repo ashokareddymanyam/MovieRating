@@ -1,5 +1,7 @@
 package com.movierating.api.rest;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,7 +32,12 @@ public MovieData addRating(@PathVariable("id") Long id, @RequestParam("movie") S
 
 @GetMapping("/maxratedmovie")
 public String getHighestRatedMovie() {
-	return homeService.findHighestRatedMovie();
+	Optional<String> findHighestRatedMovie = homeService.findHighestRatedMovie();
+	
+	if(findHighestRatedMovie.isPresent()) {
+		return findHighestRatedMovie.get();
+	}
+	return "No data found!";
 }
 
 @GetMapping("/maxratedcustomer")

@@ -11,6 +11,7 @@
 	<groupId>com.test</groupId>
 	<artifactId>movierating</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+	<packaging>war</packaging>
 	<name>movierating</name>
 	<description>Movie Rating project for Spring Boot</description>
 
